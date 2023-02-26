@@ -4,7 +4,7 @@ Test your chess skills againist this python based chess engine.
 
 ![Game_intro](https://user-images.githubusercontent.com/57285244/221416307-3bc7007a-6816-40d8-a17b-dca38d208045.png)
 
-### How to Run    
+## How to Run    
 1. Download the repository as zip and extract it.    
 2. [Python](https://www.python.org/) should be installed on the system.     
 3. Open command prompt in the extracted folder.     
