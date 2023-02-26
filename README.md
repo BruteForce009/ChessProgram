@@ -1,4 +1,4 @@
-## ChessProgram
+# ChessProgram
 
 Test your chess skills againist this python based chess engine.
 
