@@ -74,8 +74,10 @@ def start_the_game():
                     if move in validMoves:
                         gs.makeMove(move)
                         moveMade = True
-                    sqSelected = ()  # reset clicks
-                    playerClicks = []
+                        sqSelected = ()  # reset clicks
+                        playerClicks = []
+                    else:
+                        playerClicks = [sqSelected]
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_u:  # undo when u is pressed
                     gs.undoMove()
@@ -112,8 +114,8 @@ def main():
 
 
 def drawGameState(screen, gs):
-    drawBoard(screen)
-    drawPieces(screen, gs.board)
+    drawBoard(screen)  # draw squares on board
+    drawPieces(screen, gs.board)  # draw ppieces on squares
 
 
 def drawBoard(screen):
@@ -121,7 +123,7 @@ def drawBoard(screen):
         for c in range(DIMENSION):
             # color = colors[(r + c) & 1]
             color = colors[(r+c) % 2]
-            p.draw.rect(screen, color, p.Rect(c*SQ_SIZE, r*SQ_SIZE, c*SQ_SIZE, c*SQ_SIZE))
+            p.draw.rect(screen, color, p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 
 def drawPieces(screen, board):
@@ -129,7 +131,7 @@ def drawPieces(screen, board):
         for c in range(DIMENSION):
             piece = board[r][c]
             if piece != "--":
-                screen.blit(IMAGES[piece], p.Rect(c*SQ_SIZE, r*SQ_SIZE, c*SQ_SIZE, c*SQ_SIZE))
+                screen.blit(IMAGES[piece], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 
 if __name__ == "__main__":
