@@ -11,6 +11,7 @@ class GameState:
             ['wp', 'wp', 'wp', 'wp', 'wp', 'wp', 'wp', 'wp'],
             ['wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR'],
         ]
+        self.moveFunctions = {'p': self.getPawnMoves, 'R': self.getRookMoves, 'N': self.getKnightMoves, 'Q': self.getQueenMoves, 'K': self.getKingMoves, 'B': self.getBishopMoves}
         self.whiteToMove = True
         self.movelog = []
 
@@ -28,24 +29,59 @@ class GameState:
             self.whiteToMove = not self.whiteToMove  # swap turn
 
     def getValidMoves(self):
-        pass
+        return self.getAllPossibleMoves()
 
     def getAllPossibleMoves(self):
         moves = []
         for r in range(len(self.board)):
             for c in range(len(self.board[r])):
                 turn = self.board[r][c][0]
-                if (turn == 'w' and self.whiteToMove) and (turn == 'b' and not self.whiteToMove):
+                if (turn == 'w' and self.whiteToMove) or (turn == 'b' and not self.whiteToMove):
                     piece = self.board[r][c][1]
-                    if piece == 'p':
-                        self.getPawnMoves(r, c, moves)
-                    if piece == 'R':
-                        self.getRookMoves(r, c, moves)
+                    self.moveFunctions[piece](r, c, moves)
         return moves
 
     def getPawnMoves(self, r, c, moves):
+        if self.whiteToMove:
+            if self.board[r-1][c] == "--":  # one forward move
+                moves.append(Move((r, c), (r-1, c), self.board))
+                if r==6 and self.board[r-2][c] == "--":  # one forward move
+                    moves.append(Move((r, c), (r-2, c), self.board))
+            if c-1 >= 0:  # left-side capture
+                if self.board[r-1][c-1][0] == 'b':
+                    moves.append(Move((r, c), (r-1, c-1), self.board))
+            if c+1 <= 7:  # right-side capture
+                if self.board[r-1][c-1][0] == 'b':
+                    moves.append(Move((r, c), (r-1, c+1), self.board))
+        else:
+            if self.board[r + 1][c] == "--":  # one forward move
+                moves.append(Move((r, c), (r + 1, c), self.board))
+                if r == 1 and self.board[r + 2][c] == "--":  # one forward move
+                    moves.append(Move((r, c), (r + 2, c), self.board))
+            if c - 1 >= 0:  # left-side capture
+                if self.board[r + 1][c - 1][0] == 'w':
+                    moves.append(Move((r, c), (r + 1, c - 1), self.board))
+            if c + 1 <= 7:  # right-side capture
+                if self.board[r + 1][c + 1][0] == 'w':
+                    moves.append(Move((r, c), (r + 1, c + 1), self.board))
+
+
 
     def getRookMoves(self, r, c, moves):
+        pass
+
+    def getQueenMoves(self, r, c, moves):
+        pass
+
+    def getKingMoves(self, r, c, moves):
+        pass
+
+    def getKnightMoves(self, r, c, moves):
+        pass
+
+    def getBishopMoves(self, r, c, moves):
+        pass
+
 
 class Move:
     # value mapping
@@ -61,6 +97,13 @@ class Move:
         self.endCol = endSq[1]
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
+        self.moveID = self.startRow*1000 + self.startCol*100 + self.endRow*10 + self.endCol
+
+    def __eq__(self, other):  # Overriding equals method
+        if isinstance(other, Move):
+            return self.moveID == other.moveID
+        return False
+
 
     def getChessNotation(self):
         return self.getRankFile(self.startRow, self.startCol) + '-' + self.getRankFile(self.endRow, self.endCol)
