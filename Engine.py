@@ -20,6 +20,32 @@ class GameState:
         self.movelog.append(move)
         self.whiteToMove = not self.whiteToMove  # swap turn
 
+    def undoMove(self):
+        if len(self.movelog) != 0:
+            move = self.movelog.pop()
+            self.board[move.startRow][move.startCol] = move.pieceMoved
+            self.board[move.endRow][move.endCol] = move.pieceCaptured
+            self.whiteToMove = not self.whiteToMove  # swap turn
+
+    def getValidMoves(self):
+        pass
+
+    def getAllPossibleMoves(self):
+        moves = []
+        for r in range(len(self.board)):
+            for c in range(len(self.board[r])):
+                turn = self.board[r][c][0]
+                if (turn == 'w' and self.whiteToMove) and (turn == 'b' and not self.whiteToMove):
+                    piece = self.board[r][c][1]
+                    if piece == 'p':
+                        self.getPawnMoves(r, c, moves)
+                    if piece == 'R':
+                        self.getRookMoves(r, c, moves)
+        return moves
+
+    def getPawnMoves(self, r, c, moves):
+
+    def getRookMoves(self, r, c, moves):
 
 class Move:
     # value mapping

@@ -48,6 +48,8 @@ def start_the_game():
     clock = p.time.Clock()
     screen.fill(p.Color("gray"))
     gs = Engine.GameState()
+    validMoves = gs.getValidMoves()
+    moveMade = False  # flag variable for when a move is made
     loadImages()  # loads once
     running = True
     sqSelected = ()
@@ -70,8 +72,16 @@ def start_the_game():
                     move = Engine.Move(playerClicks[0], playerClicks[1], gs.board)
                     print(sl_num.__str__() + ". " + move.getChessNotation())
                     gs.makeMove(move)
+                    moveMade = True
                     sqSelected = ()  # reset clicks
                     playerClicks = []
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_u:  # undo when u is pressed
+                    gs.undoMove()
+                    moveMade = True
+        if moveMade:
+            validMoves = gs.getValidMoves()
+            moveMade = False
         drawGameState(screen, gs)
         clock.tick(FPS)
         p.display.flip()
