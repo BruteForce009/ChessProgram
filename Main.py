@@ -98,7 +98,7 @@ menu = pm.Menu('Welcome', 512, 512, theme=mytheme)
 # menu.add.text_input('Username: ', default='Bot')
 # menu.add.selector('Difficulty :', [('Hard', 1), ('Easy', 2)], onchange=set_difficulty)
 menu.add.button('Play', start_the_game)
-menu.add.selector('Color: ', [('White', 1), ('Black', 2)], onchange=theme)
+menu.add.selector('Color: ', [('White', 1), ('Black', 2)])
 menu.add.selector('Theme: ', [('Classic', 1), ('Wood', 2), ('Blue', 3), ('Green', 4)], onchange=theme)
 menu.add.button('Quit', pm.events.EXIT)
 
