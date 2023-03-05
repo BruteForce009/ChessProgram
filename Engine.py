@@ -14,12 +14,20 @@ class GameState:
         self.moveFunctions = {'p': self.getPawnMoves, 'R': self.getRookMoves, 'N': self.getKnightMoves, 'Q': self.getQueenMoves, 'K': self.getKingMoves, 'B': self.getBishopMoves}
         self.whiteToMove = True
         self.movelog = []
+        self.whiteKingLocation = (7, 4)
+        self.blackKingLocation = (0, 4)
+
 
     def makeMove(self, move):
         self.board[move.startRow][move.startCol] = "--"
         self.board[move.endRow][move.endCol] = move.pieceMoved
         self.movelog.append(move)
+        if move.pieceMoved == 'wK':
+            self.whiteKingLocation = (move.endRow, move.endCol)
+        elif move.pieceMoved == 'bK':
+            self.blackKingLocation = (move.endRow, move.endCol)
         self.whiteToMove = not self.whiteToMove  # swap turn
+
 
     def undoMove(self):
         if len(self.movelog) != 0:
@@ -28,8 +36,15 @@ class GameState:
             self.board[move.endRow][move.endCol] = move.pieceCaptured
             self.whiteToMove = not self.whiteToMove  # swap turn
 
+
     def getValidMoves(self):
+        # 1. generate all moves
+        # 2. for each, make the move
+        # 3. generate all opponent's move
+        # 4. for each of (3) check if they attack your king
+        # 5. if they attack your king, not a valid move
         return self.getAllPossibleMoves()
+
 
     def getAllPossibleMoves(self):
         moves = []
