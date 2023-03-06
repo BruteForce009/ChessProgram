@@ -71,12 +71,13 @@ def start_the_game():
                 if len(playerClicks) == 2:  # after 2nd click
                     move = Engine.Move(playerClicks[0], playerClicks[1], gs.board)
                     print(sl_num.__str__() + ". " + move.getChessNotation())
-                    if move in validMoves:
-                        gs.makeMove(move)
-                        moveMade = True
-                        sqSelected = ()  # reset clicks
-                        playerClicks = []
-                    else:
+                    for i in range(len(validMoves)):
+                        if move == validMoves[i]:
+                            gs.makeMove(move)
+                            moveMade = True
+                            sqSelected = ()  # reset clicks
+                            playerClicks = []
+                    if not moveMade:
                         playerClicks = [sqSelected]
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_u:  # undo when u is pressed
