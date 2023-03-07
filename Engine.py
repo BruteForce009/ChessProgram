@@ -359,7 +359,7 @@ class Move:
 
 
     def getChessNotation(self):
-        return self.getRankFile(self.startRow, self.startCol) + '-' + self.getRankFile(self.endRow, self.endCol)
+        return '[' + self.pieceMoved + ']' + self.getRankFile(self.startRow, self.startCol) + '-' + self.getRankFile(self.endRow, self.endCol)
 
     def getRankFile(self, r, c):
         return self.cols2Files[c] + self.rows2Ranks[r]
