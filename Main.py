@@ -3,6 +3,7 @@ import pygame_menu as pm
 import Engine
 import os
 
+import chessAI
 
 WIDTH = HEIGHT = 512
 DIMENSION = 8
@@ -57,13 +58,17 @@ def start_the_game():
     sqSelected = ()
     playerClicks = []
     gameOver = False
+    playerOne = False  # True if Human is white
+    playerTwo = False # True if Human is black
     sl_num = [1, 1]
     while running:
+        humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
+            # mouse handler
             elif e.type == p.MOUSEBUTTONDOWN:
-                if not gameOver:
+                if not gameOver and humanTurn:
                     location = p.mouse.get_pos()  # mouse coordinates
                     col = location[0]//SQ_SIZE
                     row = location[1]//SQ_SIZE
@@ -91,6 +96,7 @@ def start_the_game():
                                 playerClicks = []
                         if not moveMade:
                             playerClicks = [sqSelected]
+            # key handler
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_u:  # undo when u is pressed
                     gs.undoMove()
@@ -106,6 +112,13 @@ def start_the_game():
                     playerClicks = []
                     moveMade = False
                     animate = False
+
+        # AI move finder
+        if not gameOver and not humanTurn:
+            AIMove = chessAI.findRandomMove(validMoves)
+            gs.makeMove(AIMove)
+            moveMade = True
+            animate = True
 
         if moveMade:
             if animate:
