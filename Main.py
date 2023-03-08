@@ -1,7 +1,6 @@
 import pygame as p
 import pygame_menu as pm
 import Engine
-import os
 
 import chessAI
 
@@ -19,6 +18,9 @@ colors = [p.Color(232, 235, 239), p.Color(100, 100, 100)]
 playWhite = True
 p.mixer.init()
 moveSound = p.mixer.Sound('sounds/move.wav')
+gameOverSound = p.mixer.Sound('sounds/spooky-game-over-1948.wav')
+staleSound = p.mixer.Sound('sounds/sad-game-over-trombone-471.wav')
+
 
 
 def pieceColor(value, n):
@@ -130,8 +132,8 @@ def start_the_game():
         if not gameOver and not humanTurn:
             AIMove = chessAI.findRandomMove(validMoves)
             gs.makeMove(AIMove)
-            moveMade = True
             moveSound.play()
+            moveMade = True
             animate = True
 
         if moveMade:
@@ -145,12 +147,17 @@ def start_the_game():
 
         if gs.checkmate:
             gameOver = True
+            gameOverSound.play(fade_ms=15000)
+            # gameOverSound.fadeout(5000)
             if gs.whiteToMove:
                 drawText(screen, 'Checkmate! Black wins')
             else:
                 drawText(screen, 'Checkmate! White wins')
+            # time.sleep(5)
+            # break
         elif gs.stalemate:
             gameOver = True
+            staleSound.play(fade_ms=15000)
             drawText(screen, 'Stalemate!')
 
         # if playerTwo:
