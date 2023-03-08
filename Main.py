@@ -52,13 +52,12 @@ def start_the_game():
     validMoves = gs.getValidMoves()
     moveMade = False  # flag variable for when a move is made
     animate = False  # flag variable for when we should animate a move
-
     loadImages()  # loads once
     running = True
     sqSelected = ()
     playerClicks = []
     gameOver = False
-    playerOne = False  # True if Human is white
+    playerOne = True  # True if Human is white
     playerTwo = False # True if Human is black
     sl_num = [1, 1]
     while running:
@@ -69,20 +68,21 @@ def start_the_game():
             # mouse handler
             elif e.type == p.MOUSEBUTTONDOWN:
                 if not gameOver and humanTurn:
-                    location = p.mouse.get_pos()  # mouse coordinates
-                    col = location[0]//SQ_SIZE
-                    row = location[1]//SQ_SIZE
-                    if sqSelected == (row, col):  # same square re-clicked
-                        playerClicks = []   # empty clicks
+                    location = p.mouse.get_pos()  # x y coordinates of the mouse.
+                    col = location[0] // SQ_SIZE
+                    row = location[1] // SQ_SIZE
+                    if sqSelected == (row, col):
+                        sqSelected = ()
+                        playerClicks = []
                     else:
                         sqSelected = (row, col)
-                        playerClicks.append(sqSelected)  # append 1st and 2nd clicks
-                    if len(playerClicks) == 2:  # after 2nd click
+                        playerClicks.append(sqSelected)  # append both first and second clicks.
+                    if len(playerClicks) == 2:
                         move = Engine.Move(playerClicks[0], playerClicks[1], gs.board)
 
                         for i in range(len(validMoves)):
                             if move == validMoves[i]:
-                                gs.makeMove(move)
+                                gs.makeMove(validMoves[i])
                                 if sl_num[1] == 1:
                                     print(sl_num[0].__str__() + ". " + move.getChessNotation() + ',', end=" ")
                                     sl_num[1] = sl_num[1] + 1
@@ -122,20 +122,20 @@ def start_the_game():
 
         if moveMade:
             if animate:
-                animateMove(gs.movelog[-1], screen, gs.board, clock)
+                animateMove(gs.moveLog[-1], screen, gs.board, clock)
             validMoves = gs.getValidMoves()
             moveMade = False
             animate = False
 
         drawGameState(screen, gs, validMoves, sqSelected)
 
-        if gs.checkMate:
+        if gs.checkmate:
             gameOver = True
             if gs.whiteToMove:
                 drawText(screen, 'Checkmate! Black wins')
             else:
                 drawText(screen, 'Checkmate! White wins')
-        elif gs.staleMate:
+        elif gs.stalemate:
             gameOver = True
             drawText(screen, 'Stalemate!')
 
@@ -170,24 +170,24 @@ def main():
 def highlightSquares(screen, gs, validMoves, sqSelected):
     if sqSelected != ():
         r, c = sqSelected
-        if gs.board[r][c][0] == ('w' if gs.whiteToMove else 'b'): #square selected contains a piece that can be moved on this turn.
-            #highligh selected square
+        if gs.board[r][c][0] == ('w' if gs.whiteToMove else 'b'): # square selected contains a piece that can be moved on this turn.
+            # highlight the selected square
             s = p.Surface((SQ_SIZE, SQ_SIZE))
-            s.set_alpha(100) #transparency value 0-255
+            s.set_alpha(100) # transparency value 0-255
             s.fill(p.Color('blue'))
             screen.blit(s, (c * SQ_SIZE, r*SQ_SIZE))
-            #highlight moves available from that square
+            # highlight moves available from that square
             s.fill(p.Color('yellow'))
             for move in validMoves:
                 if move.startRow == r and move.startCol == c:
-                    screen.blit(s, (SQ_SIZE* move.endCol, SQ_SIZE*move.endRow))
+                    screen.blit(s, (SQ_SIZE * move.endCol, SQ_SIZE*move.endRow))
 
 
 
 def drawGameState(screen, gs, validMoves, sqSelected):
     drawBoard(screen)  # draw squares on board
     highlightSquares(screen, gs, validMoves, sqSelected)
-    drawPieces(screen, gs.board)  # draw ppieces on squares
+    drawPieces(screen, gs.board)  # draw pieces on squares
 
 
 def drawBoard(screen):
