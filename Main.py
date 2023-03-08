@@ -16,7 +16,19 @@ p.display.set_caption('Game on !')
 pygame_icon = p.image.load("images/wN.png")
 p.display.set_icon(pygame_icon)
 colors = [p.Color(232, 235, 239), p.Color(100, 100, 100)]
+playWhite = True
+p.mixer.init()
+moveSound = p.mixer.Sound('sounds/move.wav')
 
+
+def pieceColor(value, n):
+    global playWhite
+    # if value == "White":
+    if n == 1:
+        playWhite = True
+    # if value == "Black":
+    else:
+        playWhite = False
 
 def theme(value, n):
     # if value == "Classic":
@@ -57,8 +69,8 @@ def start_the_game():
     sqSelected = ()
     playerClicks = []
     gameOver = False
-    playerOne = True  # True if Human is white
-    playerTwo = False # True if Human is black
+    playerOne = playWhite  # True if Human is white
+    playerTwo = not playWhite # True if Human is black
     sl_num = [1, 1]
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
@@ -90,6 +102,7 @@ def start_the_game():
                                     print( move.getChessNotation())
                                     sl_num[1] = sl_num[1] - 1
                                     sl_num[0] = sl_num[0] + 1
+                                moveSound.play()
                                 moveMade = True
                                 animate = True
                                 sqSelected = ()  # reset clicks
@@ -118,6 +131,7 @@ def start_the_game():
             AIMove = chessAI.findRandomMove(validMoves)
             gs.makeMove(AIMove)
             moveMade = True
+            moveSound.play()
             animate = True
 
         if moveMade:
@@ -139,6 +153,8 @@ def start_the_game():
             gameOver = True
             drawText(screen, 'Stalemate!')
 
+        # if playerTwo:
+        #     screen.blit(p.transform.rotate(screen, 180), (0, 0))
         clock.tick(FPS)
         p.display.flip()
 
@@ -151,7 +167,7 @@ menu = pm.Menu('Welcome', 512, 512, theme=mytheme)
 # menu.add.text_input('Username: ', default='Bot')
 # menu.add.selector('Difficulty :', [('Hard', 1), ('Easy', 2)], onchange=set_difficulty)
 menu.add.button('Play', start_the_game)
-menu.add.selector('Color: ', [('White', 1), ('Black', 2)])
+menu.add.selector('Color: ', [('White', 1), ('Black', 2)], onchange=pieceColor)
 menu.add.selector('Theme: ', [('Classic', 1), ('Wood', 2), ('Blue', 3), ('Green', 4)], onchange=theme)
 menu.add.button('Quit', pm.events.EXIT)
 
