@@ -129,7 +129,7 @@ def start_the_game():
 
         # AI move finder
         if not gameOver and not humanTurn:
-            AIMove = chessAI.findBestMoveMinMax(gs, validMoves)
+            AIMove = chessAI.findBestMove(gs, validMoves)
             if AIMove is None:
                 AIMove = chessAI.findRandomMove(validMoves)
             gs.makeMove(AIMove)
