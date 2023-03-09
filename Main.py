@@ -148,7 +148,7 @@ def start_the_game():
 
         if gs.checkmate:
             gameOver = True
-            gameOverSound.play(fade_ms=30000)
+            gameOverSound.play()
             # gameOverSound.fadeout(5000)
             if gs.whiteToMove:
                 drawText(screen, 'Checkmate! Black wins')
@@ -158,7 +158,7 @@ def start_the_game():
             # break
         elif gs.stalemate:
             gameOver = True
-            staleSound.play(fade_ms=15000)
+            staleSound.play()
             drawText(screen, 'Stalemate!')
 
         # if playerTwo:
