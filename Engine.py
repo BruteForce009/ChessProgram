@@ -1,6 +1,4 @@
-"""
-
-"""
+import time, timeit, math
 
 
 class GameState():
@@ -30,6 +28,7 @@ class GameState():
         self.checkmate = False
         self.stalemate = False
         self.enpassantPossible = ()  # coordinates for the square where an en passant capture is possible.
+        self.enpassantPossibleLog = [self.enpassantPossible]
         self.currentCastlingRight = CastleRights(True, True, True, True)
         self.castleRightsLog = [
             CastleRights(self.currentCastlingRight.wks, self.currentCastlingRight.bks, self.currentCastlingRight.wqs,
@@ -72,7 +71,7 @@ class GameState():
             else:  # queenside castle move
                 self.board[move.endRow][move.endCol + 1] = self.board[move.endRow][move.endCol - 2]
                 self.board[move.endRow][move.endCol - 2] = '--'
-
+        self.enpassantPossibleLog.append(self.enpassantPossible)
         # update castling rights - whenever a rook or king moves.
         self.updateCastleRights(move)
         self.castleRightsLog.append(
@@ -102,6 +101,19 @@ class GameState():
                     self.currentCastlingRight.bqs = False
                 elif move.startCol == 7:  # right rook
                     self.currentCastlingRight.bks = False
+        # Rook captured
+        if move.pieceCaptured == 'wR':
+            if move.endRow == 7:
+                if move.endCol == 0:
+                    self.currentCastlingRight.wqs = False
+                elif move.endCol == 7:
+                    self.currentCastlingRight.wks = False
+        elif move.pieceCaptured == 'bR':
+            if move.endRow == 0:
+                if move.endCol == 0:
+                    self.currentCastlingRight.bqs = False
+                elif move.endCol == 7:
+                    self.currentCastlingRight.bks = False
 
     '''
     Undo the last move made
@@ -124,9 +136,10 @@ class GameState():
                 self.board[move.endRow][move.endCol] = '--'  # leave landing square blank
                 self.board[move.startRow][move.endCol] = move.pieceCaptured
                 self.enpassantPossible = (move.endRow, move.endCol)
-            # undo a 2-square pawn advance
-            if move.pieceMoved[1] == 'p' and abs(move.startRow - move.endRow) == 2:
-                self.enpassantPossible = ()
+
+            self.enpassantPossibleLog.pop()
+            self.enpassantPossible = self.enpassantPossibleLog[-1]
+
             # undo castling rights
             self.castleRightsLog.pop()  # get rid of the most recent entry
             self.currentCastlingRight = CastleRights(self.castleRightsLog[-1].wks, self.castleRightsLog[-1].bks,
@@ -422,6 +435,22 @@ class CastleRights():
         self.bqs = bqs
 
 
+class Timer:
+    def __init__(self, totalTime):
+        self.totalTime = totalTime
+        self.initTime = time.time()
+        self.pauseTime = time.time()
+
+    def pause(self):
+        self.pauseTime = time.time()
+
+    def play(self):
+        self.totalTime += time.time() - self.pauseTime
+
+    def left(self):
+        return self.totalTime - (time.time() - self.initTime)
+
+
 class Move():
     # maps keys to values
     # key : value
@@ -447,6 +476,8 @@ class Move():
         # castle move
         self.isCastleMove = isCastleMove
 
+        self.isCapture = self.pieceCaptured != '--'
+
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
         # print(self.moveID)
 
@@ -463,3 +494,29 @@ class Move():
 
     def getRankFile(self, r, c):
         return self.colsToFiles[c] + self.rowsToRanks[r]
+
+    # override str()
+    def __str__(self):
+        # castle
+        if self.isCastleMove:
+            return "O-O" if self.endCol == 6 else "O-O-O" # king side
+
+        endSquare = self.getRankFile(self.endRow, self.endCol)
+        # pawn moves
+        if self.pieceMoved[1] == 'p':
+            if self.isCapture:
+                return self.colsToFiles[self.startCol] + 'x' + endSquare
+            else:
+                return endSquare
+
+        # pawn promotion
+
+        # Knight dual moves
+
+        # Rook dual moves
+
+        # piece moves
+        moveString = self.pieceMoved[1]
+        if self.isCapture:
+            moveString += 'x'
+        return moveString + endSquare
