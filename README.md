@@ -10,7 +10,7 @@ Test your chess skills againist this python based chess engine.
 3. Open command prompt in the extracted folder.     
 4. Install packages: `pip install -r requirements.txt`     
 5. Run the game with this command: `python Main.py`     
-6. Choose board theme from menu.     
+6. Choose piece color and board theme from menu.     
 7. Enjoy !
 
 ![chk-mt](https://user-images.githubusercontent.com/57285244/224545877-80248795-bacf-4661-a660-22e43e666791.png)
