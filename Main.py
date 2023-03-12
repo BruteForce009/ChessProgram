@@ -1,6 +1,7 @@
 import pygame as p
 import pygame_menu as pm
-import Engine, chessAI
+import Engine
+import chessAI
 # from multiprocessing import Process, Queue
 
 
@@ -91,11 +92,13 @@ def start_the_game():
     # Thread-
     # AIThinking = False
     # moveFinderProcess = None
+    # moveUndone = False
 
     sl_num = [1, 1]
     global pieceCapCounter
 
     while running:
+
         # if gs.whiteToMove:
         #     whiteTimer.play()
         #     blackTimer.pause()
@@ -103,6 +106,7 @@ def start_the_game():
         #     blackTimer.play()
         #     whiteTimer.pause()
         # print("white time = " + str(whiteTimer.left()) + "  black time = " + str(blackTimer.left()) + " ")
+
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         for e in p.event.get():
             if e.type == p.QUIT:
@@ -111,7 +115,7 @@ def start_the_game():
             # mouse handler
             elif e.type == p.MOUSEBUTTONDOWN:
                 if not gameOver and humanTurn:
-                    # Thread- if not gameOver:
+                    # --- if not gameOver:
                     location = p.mouse.get_pos()  # x y coordinates of the mouse.
                     col = location[0] // SQ_SIZE
                     row = location[1] // SQ_SIZE
@@ -122,7 +126,7 @@ def start_the_game():
                         sqSelected = (row, col)
                         playerClicks.append(sqSelected)  # append both first and second clicks.
                     if len(playerClicks) == 2:
-                        # Thread- if len(playerClicks) == 2 and humanTurn:
+                        # --- if len(playerClicks) == 2 and humanTurn:
                         move = Engine.Move(playerClicks[0], playerClicks[1], gs.board)
 
                         for i in range(len(validMoves)):
@@ -139,9 +143,10 @@ def start_the_game():
                                     print(sl_num[0].__str__() + ". " + move.getChessNotation() + ',', end=" ")
                                     sl_num[1] = sl_num[1] + 1
                                 else:
-                                    print( move.getChessNotation())
+                                    print(move.getChessNotation())
                                     sl_num[1] = sl_num[1] - 1
                                     sl_num[0] = sl_num[0] + 1
+
                                 moveSound.play()
                                 moveMade = True
                                 animate = True
@@ -158,6 +163,12 @@ def start_the_game():
                     sqSelected = ()
                     playerClicks = []
                     gameOver = False
+
+                    # if AIThinking:
+                    #     moveFinderProcess.terminate()
+                    #     AIThinking = False
+                    # moveUndone = True
+
                 if e.key == p.K_r:  # reset board if 'r' is pressed
                     gs = Engine.GameState()
                     validMoves = gs.getValidMoves()
@@ -166,6 +177,11 @@ def start_the_game():
                     moveMade = False
                     animate = False
                     gameOver = False
+
+                    # if AIThinking:
+                    #     moveFinderProcess.terminate()
+                    #     AIThinking = False
+                    # moveUndone = True
 
         # AI move finder
         if not gameOver and not humanTurn:
@@ -177,25 +193,26 @@ def start_the_game():
             moveMade = True
             animate = True
 
-            # Thread-
-            '''
-            if not gameOver and not humanTurn:
-                if not AIThinking:
-                    AIThinking = True
-                    print('Thinking...')
-                    returnQueue = Queue()  # to pass data between threads
-                    moveFinderProcess = Process(target=chessAI.findBestMove, args=(gs, validMoves, returnQueue))
-                    moveFinderProcess.start()  # call findBestMove(gs, validMoves, returnQueue)
 
-                    if not moveFinderProcess.is_alive():
-                        print('Done')
-                        AIMove = returnQueue.get()
-                        if AIMove is None:
-                            AIMove = chessAI.findRandomMove(validMoves)
-                        gs.makeMove(AIMove)
-                        moveSound.play()
-                        moveMade = True
-                        animate = True
+        # AI move finder Thread-
+        '''
+        if not gameOver and not humanTurn and not moveUndone:
+            if not AIThinking:
+                AIThinking = True
+                print('Thinking...')
+                returnQueue = Queue()  # to pass data between threads
+                moveFinderProcess = Process(target=chessAI.findBestMove, args=(gs, validMoves, returnQueue))
+                moveFinderProcess.start()  # call findBestMove(gs, validMoves, returnQueue)
+
+                if not moveFinderProcess.is_alive():
+                    print('Done')
+                    AIMove = returnQueue.get()
+                    if AIMove is None:
+                        AIMove = chessAI.findRandomMove(validMoves)
+                    gs.makeMove(AIMove)
+                    moveSound.play()
+                    moveMade = True
+                    animate = True
             '''
 
         if moveMade:
@@ -204,6 +221,7 @@ def start_the_game():
             validMoves = gs.getValidMoves()
             moveMade = False
             animate = False
+            # moveUndone = False
 
         drawGameState(screen, gs, validMoves, sqSelected, moveLogFont)
 
